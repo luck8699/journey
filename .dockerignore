@@ -1,0 +1,9 @@
+out/
+data/
+preview.png
+cloudflared.exe
+*.zip
+.edge-*
+shots*/
+tools/
+*.log

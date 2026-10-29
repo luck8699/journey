@@ -1,0 +1,12 @@
+out/
+data/*
+!data/.gitkeep
+.edge-*
+shots*/
+tools/
+*.log
+*.zip
+cloudflared.exe
+.env
+.gh-browser/
+gh-login.png

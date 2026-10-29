@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: journey
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: JOURNEY_ONLINE
+        value: "1"
+      - key: JOURNEY_PASSWORD
+        sync: false
+    autoDeploy: true
+    # Add a paid persistent disk so the plan survives restarts:
+    # disk:
+    #   name: journey-data
+    #   mountPath: /app/data
+    #   sizeGB: 1
