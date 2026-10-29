@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Journey：私人的国内与国际旅行规划台，含签证教程、景点距离、就近排序和可勾选的行程计划表。">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f5f3ee">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Journey">
+  <title>Journey · 私人旅行计划</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/journey.css">
+</head>
+<body class="journey">
+  <a class="skip-link" href="#domesticView">跳到主要内容</a>
+  <div class="paper-grain" aria-hidden="true"></div>
+
+  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 14 6-6 6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 10 6 6 6-6"/></symbol>
+    <symbol id="i-grip" viewBox="0 0 24 24"><path d="M9 5h.01M15 5h.01M9 12h.01M15 12h.01M9 19h.01M15 19h.01" stroke-width="2.6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.6"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8 19h3a3 3 0 0 0 3-3v-8a3 3 0 0 1 3-3h-1M6 16V9a4 4 0 0 1 4-4h2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24"><path d="M4 7h16v3a2 2 0 0 0 0 4v3H4v-3a2 2 0 0 0 0-4V7Z"/><path d="M14 7v10" stroke-dasharray="2 2.5"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 16 .8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v5h5M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H4V8h16v9h-3"/><path d="M7 13h10v8H7v-8Z"/><path d="M17 11h.01" stroke-width="2.6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Z"/><path d="M9 3v15M15 6v15"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></symbol>
+    <symbol id="i-bowl" viewBox="0 0 24 24"><path d="M4 12h16a8 8 0 0 1-16 0ZM7 12c0-3 1-5 2-7M12 12c0-3 1-5 2-7M17 12c0-2 .7-4 1.5-5"/></symbol>
+    <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 4-4 2 2-4 4-2Z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9S14.5 18.3 12 21c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3Z"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M19 14v6H4V5h6"/></symbol>
+  </svg>
+
+  <header class="topbar" id="top">
+    <a class="brand" href="#top" aria-label="Journey 首页">
+      <span class="brand-word">JOURNEY</span>
+      <span class="brand-sub">PRIVATE TRAVEL PLANNER</span>
+    </a>
+    <nav class="main-nav" aria-label="主导航">
+      <button class="nav-link is-active" data-view="domestic" type="button">国内</button>
+      <button class="nav-link" data-view="international" type="button">国际</button>
+      <button class="nav-link nav-plan-link" id="mobilePlanBtn" type="button">
+        行程 <span class="nav-count" id="mobilePlanCount">0</span>
+      </button>
+    </nav>
+    <div class="topbar-side">
+      <span class="connection-badge" id="connectionBadge"><span class="status-dot"></span><span id="connectionText">ONLINE</span></span>
+      <button class="session-exit" id="logoutBtn" type="button" hidden>退出</button>
+      <button class="icon-btn mobile-only" id="mobilePlanIconBtn" type="button" aria-label="打开我的行程">
+        <svg class="icon"><use href="#i-route"></use></svg><span class="nav-count" id="mobilePlanCount2">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <div class="content-column">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">JOURNEY <span>—</span> PRIVATE TRAVEL PLANNER <span class="eyebrow-year" id="currentYear">2026</span></p>
+          <h1 id="heroTitle">去更远的地方，<br><span>让计划更简单。</span></h1>
+          <p class="hero-lead">国内 18 座城市、国际 18 个国家。签证、路线与距离，收进一张属于你的清单。</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" type="button" data-jump="domestic">
+              开始探索 <svg class="icon"><use href="#i-arrow"></use></svg>
+            </button>
+            <button class="btn btn-ghost" type="button" data-jump="international">
+              签证指南 <svg class="icon"><use href="#i-globe"></use></svg>
+            </button>
+          </div>
+          <dl class="hero-stats" id="heroStats">
+            <div><dt>城市</dt><dd><strong>18</strong><span>座</span></dd></div>
+            <div><dt>地点</dt><dd><strong>—</strong><span>个</span></dd></div>
+            <div><dt>国家</dt><dd><strong>18</strong><span>个</span></dd></div>
+            <div><dt>行程</dt><dd><strong id="heroPlanCount">0</strong><span>站</span></dd></div>
+          </dl>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <figure class="hero-quote">
+            <span class="hero-quote-mark">“</span>
+            <blockquote>旅行不是把日程填满，<br>而是把喜欢的地方，<br>排成一条顺路的线。</blockquote>
+            <figcaption><span>JOURNEY NOTES</span><span>NO. 001</span></figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="quick-steps" aria-label="使用步骤">
+        <div class="quick-step"><span>01</span><div><strong>挑选目的地</strong><small>城市、国家或一条现成线路</small></div></div>
+        <div class="quick-step"><span>02</span><div><strong>加入行程</strong><small>拖动，或点一下加入</small></div></div>
+        <div class="quick-step"><span>03</span><div><strong>按距离排序</strong><small>少走回头路</small></div></div>
+        <div class="quick-step"><span>04</span><div><strong>出发前勾选</strong><small>完成一站，划掉一站</small></div></div>
+      </section>
+
+      <section id="domesticView" class="view is-active" aria-labelledby="domesticTitle">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">01 — CHINA</p>
+            <h2 id="domesticTitle">国内旅行</h2>
+            <p class="section-desc">从故宫到雪山，从城市到海岸。先挑一条成熟线路，或按城市自由组合。</p>
+          </div>
+          <div class="section-meta"><span id="domesticCount">—</span> 个打卡点 · <span id="domesticCityCount">18</span> 座城</div>
+        </div>
+
+        <div class="toolbar">
+          <label class="searchbox">
+            <svg class="icon"><use href="#i-search"></use></svg>
+            <input id="domesticSearch" type="search" placeholder="搜城市、景点、美食，例如：西湖 / 火锅" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <div class="region-chips" id="regionChips" role="group" aria-label="按地区筛选"></div>
+        </div>
+
+        <div class="subsection-heading">
+          <div><h3>先抄一条成熟线路</h3><p>整条加入计划，顺序已经排好，之后还能拖动调整。</p></div>
+          <span class="soft-tag"><svg class="icon"><use href="#i-route"></use></svg>一键加入</span>
+        </div>
+        <div class="route-grid" id="routeList"></div>
+
+        <div class="subsection-heading city-heading">
+          <div>
+            <h3>按城市挑打卡点</h3>
+            <p>同一城市内按地理位置就近排序，卡片标出了“离谁近”；跨城请留出交通时间。</p>
+          </div>
+          <span class="sort-hint"><svg class="icon"><use href="#i-compass"></use></svg>由近到远</span>
+        </div>
+        <div id="cityList" class="city-list"></div>
+        <div id="domesticEmpty" class="empty-panel" hidden>
+          <svg class="icon"><use href="#i-search"></use></svg>
+          <h3>没有找到匹配的目的地</h3>
+          <p>换个关键词，或点“全部”地区再看看。</p>
+        </div>
+      </section>
+
+      <section id="internationalView" class="view" aria-labelledby="internationalTitle" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">02 — WORLD</p>
+            <h2 id="internationalTitle">国际旅行</h2>
+            <p class="section-desc">免签、面签、申签，三种路径分开整理。每个国家都有一份可执行的签证教程。</p>
+          </div>
+          <div class="section-meta"><span id="intlCount">—</span> 个国家 · <span id="intlAttractionCount">—</span> 个打卡点</div>
+        </div>
+
+        <div class="visa-tabs" id="visaTabs" role="tablist" aria-label="签证类型"></div>
+        <div class="visa-category-banner" id="visaCategoryBanner">
+          <div class="visa-banner-icon"><svg class="icon"><use href="#i-doc"></use></svg></div>
+          <div>
+            <h3 id="visaBannerTitle">免签 · 拿起护照就走</h3>
+            <p id="visaBannerDesc"></p>
+          </div>
+          <span class="baseline-badge" id="visaBaseline">资料基线 2025.06</span>
+        </div>
+
+        <div class="toolbar intl-toolbar">
+          <label class="searchbox">
+            <svg class="icon"><use href="#i-search"></use></svg>
+            <input id="intlSearch" type="search" placeholder="搜国家、城市、景点，例如：首尔 / 大皇宫" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <div class="toolbar-note"><svg class="icon"><use href="#i-pin"></use></svg>同城打卡点已按距离由近到远排序</div>
+        </div>
+
+        <div id="countryList" class="country-list"></div>
+        <div id="intlEmpty" class="empty-panel" hidden>
+          <svg class="icon"><use href="#i-globe"></use></svg>
+          <h3>没有找到这个国家</h3>
+          <p>试试国家名、城市名或景点名，也可以切换签证类型。</p>
+        </div>
+
+        <div class="data-disclaimer">
+          <svg class="icon"><use href="#i-doc"></use></svg>
+          <div>
+            <strong>签证信息不是法律意见</strong>
+            <p>页面内容整理于 <span id="intlBaselineText">2025.06</span>，签证政策、费用和材料会随时调整。出发前请以各国使领馆、移民局和签证中心官网为准。免签也不等于保证入境。</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="footer-brand"><span class="footer-word">JOURNEY</span><small>PRIVATE TRAVEL PLANNER</small></div>
+        <p>距离按经纬度直线估算，实际交通请以导航为准。愿每一次出发，都不赶路。</p>
+        <span class="footer-mark">MMXXVI</span>
+      </footer>
+    </div>
+
+    <aside class="plan-panel" id="planPanel" aria-labelledby="planTitle">
+      <div class="plan-mobile-head">
+        <span>当前行程</span>
+        <button class="icon-btn light" id="closePlanBtn" type="button" aria-label="关闭计划面板">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </div>
+      <div class="plan-scroll">
+        <div class="plan-header">
+          <div class="plan-eyebrow"><span class="status-dot"></span>CURRENT JOURNEY <span id="saveStatus">加载中…</span></div>
+          <input class="plan-title" id="planTitle" value="我的旅行计划" maxlength="40" aria-label="计划标题">
+          <p class="plan-subtitle" id="planSubtitle">从一座城市开始。</p>
+        </div>
+
+        <div class="plan-stats">
+          <div><strong id="planTotal">0</strong><span>站</span><small>总站点</small></div>
+          <div><strong id="planDone">0</strong><span>站</span><small>已完成</small></div>
+          <div><strong id="planDistance">0</strong><span>km</span><small>总路程</small></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>进度</span><span id="progressText">0 / 0</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <div class="plan-actions">
+          <button class="plan-action" id="optimizeBtn" type="button" title="保留第 1 站，其余按直线距离由近到远重排">
+            <svg class="icon"><use href="#i-route"></use></svg>排序
+          </button>
+          <button class="plan-action" id="customBtn" type="button">
+            <svg class="icon"><use href="#i-plus"></use></svg>添加
+          </button>
+          <button class="plan-action danger" id="clearBtn" type="button">
+            <svg class="icon"><use href="#i-trash"></use></svg>清空
+          </button>
+        </div>
+
+        <div id="planList" class="plan-list" aria-live="polite"></div>
+        <div id="planEmpty" class="plan-empty">
+          <div class="empty-compass"><svg class="icon"><use href="#i-compass"></use></svg></div>
+          <h3>还没有目的地</h3>
+          <p>从左侧选择，或直接把地点拖进这里。</p>
+          <div class="empty-route"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="next-stops" id="nextStops" hidden>
+          <div class="next-head">
+            <span><svg class="icon"><use href="#i-spark"></use></svg>下一站</span>
+            <small>按距离推荐</small>
+          </div>
+          <div id="nextStopList"></div>
+        </div>
+
+        <div class="plan-footer">
+          <button class="plan-foot-btn" id="exportBtn" type="button"><svg class="icon"><use href="#i-download"></use></svg>导出</button>
+          <button class="plan-foot-btn" id="printBtn" type="button"><svg class="icon"><use href="#i-print"></use></svg>打印</button>
+        </div>
+        <p class="plan-storage-note"><span class="status-dot"></span>自动保存 · 仅自己可见</p>
+      </div>
+    </aside>
+  </main>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+
+  <dialog class="modal visa-modal" id="visaDialog">
+    <div class="modal-shell">
+      <button class="modal-close" type="button" data-close="visaDialog" aria-label="关闭签证教程">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+      <div id="visaContent"></div>
+    </div>
+  </dialog>
+
+  <dialog class="modal small-modal" id="customDialog">
+    <form class="modal-shell" id="customForm" method="dialog">
+      <button class="modal-close" type="button" data-close="customDialog" aria-label="关闭">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+      <p class="modal-kicker">ADD A STOP</p>
+      <h2>添加自定义行程</h2>
+      <p class="modal-lead">适合航班、酒店、餐厅或临时想去的地方。自定义项没有坐标，不参与距离计算。</p>
+      <label class="field">
+        <span>名称 <b>*</b></span>
+        <input id="customName" name="name" maxlength="50" required placeholder="例如：飞往大阪的航班">
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>城市 / 国家</span>
+          <input id="customCity" name="city" maxlength="30" placeholder="例如：大阪">
+        </label>
+        <label class="field">
+          <span>预计用时</span>
+          <input id="customDuration" name="duration" maxlength="20" placeholder="例如：3 小时">
+        </label>
+      </div>
+      <label class="field">
+        <span>备注</span>
+        <textarea id="customNote" name="note" maxlength="160" rows="3" placeholder="航班号、地址、预约时间…"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" data-close="customDialog">取消</button>
+        <button class="btn btn-primary" type="submit">加入计划 <svg class="icon"><use href="#i-plus"></use></svg></button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal confirm-modal" id="confirmDialog">
+    <div class="modal-shell">
+      <button class="modal-close" type="button" data-close="confirmDialog" aria-label="关闭">
+        <svg class="icon"><use href="#i-close"></use></svg>
+      </button>
+      <p class="modal-kicker">PLEASE CONFIRM</p>
+      <h2 id="confirmTitle">确认清空计划？</h2>
+      <p class="modal-lead" id="confirmText">清空后将无法恢复，但已经保存的浏览器记录也会一起删除。</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" id="confirmCancel">再想想</button>
+        <button class="btn btn-danger" type="button" id="confirmOk">确认清空</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="data/domestic.js"></script>
+  <script src="data/intl-free.js"></script>
+  <script src="data/intl-interview.js"></script>
+  <script src="data/intl-apply.js"></script>
+  <script src="data/international.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
