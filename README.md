@@ -2,6 +2,12 @@
 
 **A private travel planner, for the places you keep thinking about.**
 
+固定在线地址（电脑关机也能打开）：
+
+### https://luck8699.github.io/journey/
+
+这是 Journey 的 **GitHub Pages 静态版**：所有攻略、签证教程、打卡点和计划表都能用，行程保存在当前浏览器。需要访问码登录、跨设备同步时，运行 Java 服务版。
+
 一个用 Java 写后端的私人旅行规划网页。零第三方依赖、无需数据库；支持手机访问、访问码登录、行程云端保存。视觉上做了极简重排：暖白、墨黑与一点旧金色，更多留白，更少装饰。
 
 ![页面预览](preview.png)

@@ -1,5 +1,11 @@
 # Journey · 在线部署
 
+## 固定在线地址（已部署）
+
+### https://luck8699.github.io/journey/
+
+GitHub Pages 静态版，电脑关机也能打开。行程保存在当前浏览器；跨设备同步和访问码登录需要使用 Java 服务版。
+
 Journey 现在有两种在线方式：
 
 1. **临时公网链接**：电脑开着，运行 `start-online.bat`，几十秒后得到一个 `https://…trycloudflare.com` 地址，手机可以直接打开。
