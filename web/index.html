@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="gate-locked">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,8 +15,42 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/journey.css">
+  <script>
+    try {
+      if (Number(localStorage.getItem("journey-gate-until")) > Date.now()) {
+        document.documentElement.classList.remove("gate-locked");
+      }
+    } catch (e) {}
+  </script>
 </head>
 <body class="journey">
+  <div class="gate" id="gate" aria-label="Journey 私人入口">
+    <div class="gate-top">
+      <span class="gate-brand">JOURNEY</span>
+      <span class="gate-edition">PRIVATE EDITION · MMXXVI</span>
+    </div>
+    <div class="gate-main">
+      <div class="gate-copy">
+        <p class="gate-kicker">PRIVATE ACCESS</p>
+        <h1>你的旅程，<br><span>只对你开放。</span></h1>
+        <p>输入访问密码，进入你的私人旅行空间。</p>
+      </div>
+      <form class="gate-form" id="gateForm" autocomplete="off">
+        <label for="gateCode">ACCESS CODE</label>
+        <div class="gate-input-row">
+          <input id="gateCode" type="password" inputmode="text" autocomplete="current-password"
+            autocapitalize="off" spellcheck="false" placeholder="输入密码" required>
+          <button type="submit" aria-label="进入 Journey">
+            <svg class="icon"><use href="#i-arrow"></use></svg>
+          </button>
+        </div>
+        <p class="gate-error" id="gateError" role="alert"></p>
+        <p class="gate-hint">Only the places you keep thinking about.</p>
+      </form>
+    </div>
+    <div class="gate-foot"><span>JOURNEY NOTES</span><span>NO. 001</span></div>
+  </div>
+
   <a class="skip-link" href="#domesticView">跳到主要内容</a>
   <div class="paper-grain" aria-hidden="true"></div>
 
@@ -60,8 +94,12 @@
       </button>
     </nav>
     <div class="topbar-side">
+      <button class="topbar-search" id="searchOpenBtn" type="button" aria-label="搜索目的地">
+        <svg class="icon"><use href="#i-search"></use></svg><span>搜索</span>
+      </button>
       <span class="connection-badge" id="connectionBadge"><span class="status-dot"></span><span id="connectionText">ONLINE</span></span>
       <button class="session-exit" id="logoutBtn" type="button" hidden>退出</button>
+      <button class="session-exit" id="lockBtn" type="button">锁定</button>
       <button class="icon-btn mobile-only" id="mobilePlanIconBtn" type="button" aria-label="打开我的行程">
         <svg class="icon"><use href="#i-route"></use></svg><span class="nav-count" id="mobilePlanCount2">0</span>
       </button>
@@ -74,7 +112,7 @@
         <div class="hero-copy">
           <p class="eyebrow">JOURNEY <span>—</span> PRIVATE TRAVEL PLANNER <span class="eyebrow-year" id="currentYear">2026</span></p>
           <h1 id="heroTitle">去更远的地方，<br><span>让计划更简单。</span></h1>
-          <p class="hero-lead">国内 18 座城市、国际 18 个国家。签证、路线与距离，收进一张属于你的清单。</p>
+          <p class="hero-lead">国内 34 座城市、国际 30 个国家。签证、路线与距离，收进一张属于你的清单。</p>
           <div class="hero-actions">
             <button class="btn btn-primary" type="button" data-jump="domestic">
               开始探索 <svg class="icon"><use href="#i-arrow"></use></svg>
@@ -83,6 +121,11 @@
               签证指南 <svg class="icon"><use href="#i-globe"></use></svg>
             </button>
           </div>
+          <button class="hero-search" id="heroSearchBtn" type="button">
+            <svg class="icon"><use href="#i-search"></use></svg>
+            <span>搜索城市、国家或景点</span>
+            <kbd>/</kbd>
+          </button>
           <dl class="hero-stats" id="heroStats">
             <div><dt>城市</dt><dd><strong>18</strong><span>座</span></dd></div>
             <div><dt>地点</dt><dd><strong>—</strong><span>个</span></dd></div>
@@ -261,6 +304,28 @@
 
   <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
 
+  <dialog class="search-dialog" id="searchDialog">
+    <div class="search-shell">
+      <div class="search-head">
+        <span class="search-word">SEARCH <small>寻路</small></span>
+        <button class="search-close" type="button" data-close="searchDialog" aria-label="关闭搜索">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </div>
+      <label class="global-search" for="globalSearch">
+        <svg class="icon"><use href="#i-search"></use></svg>
+        <input id="globalSearch" type="search" placeholder="搜索城市、国家、景点…"
+          autocomplete="off" spellcheck="false">
+        <kbd>ESC</kbd>
+      </label>
+      <div class="search-body">
+        <div class="search-recommend" id="searchRecommend"></div>
+        <div class="search-results" id="searchResults" hidden></div>
+      </div>
+      <div class="search-foot"><span>JOURNEY INDEX</span><span>城市 · 国家 · 打卡点</span></div>
+    </div>
+  </dialog>
+
   <dialog class="modal visa-modal" id="visaDialog">
     <div class="modal-shell">
       <button class="modal-close" type="button" data-close="visaDialog" aria-label="关闭签证教程">
@@ -321,9 +386,12 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="data/domestic.js"></script>
+  <script src="data/domestic-extra.js"></script>
   <script src="data/intl-free.js"></script>
   <script src="data/intl-interview.js"></script>
   <script src="data/intl-apply.js"></script>
+  <script src="data/intl-extra-free.js"></script>
+  <script src="data/intl-extra-apply.js"></script>
   <script src="data/international.js"></script>
   <script src="js/app.js"></script>
 </body>
