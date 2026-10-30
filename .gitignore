@@ -10,3 +10,5 @@ cloudflared.exe
 .env
 .gh-browser/
 gh-login.png
+*-pages.png
+pages-search.png
