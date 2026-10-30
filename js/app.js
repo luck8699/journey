@@ -5,6 +5,9 @@
   const INTL = window.INTERNATIONAL_DATA;
   const STORAGE_KEY = "journey-plan-v1";
   const LEGACY_STORAGE_KEY = "yuanxing-atlas-plan-v1";
+  const GATE_KEY = "journey-gate-until";
+  const GATE_HASH = "93e6664d4013d5c4f6dc6e2ebe44b35c33cada963c485633874b9bf3dec3f60b";
+  const GATE_DAYS = 30;
   const CAT_MAP = new Map((INTL?.categories || []).map((cat) => [cat.id, cat]));
 
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -314,7 +317,17 @@
     exportBtn: $("#exportBtn"),
     printBtn: $("#printBtn"),
     connectionText: $("#connectionText"),
-    logoutBtn: $("#logoutBtn")
+    logoutBtn: $("#logoutBtn"),
+    lockBtn: $("#lockBtn"),
+    gateForm: $("#gateForm"),
+    gateCode: $("#gateCode"),
+    gateError: $("#gateError"),
+    searchOpenBtn: $("#searchOpenBtn"),
+    heroSearchBtn: $("#heroSearchBtn"),
+    searchDialog: $("#searchDialog"),
+    globalSearch: $("#globalSearch"),
+    searchRecommend: $("#searchRecommend"),
+    searchResults: $("#searchResults")
   };
 
   // ---------------------------------------------------------
@@ -429,6 +442,61 @@
 
   function setSaveStatus(text) {
     if (els.saveStatus) els.saveStatus.textContent = text;
+  }
+
+  async function sha256Hex(value) {
+    const data = new TextEncoder().encode(value);
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  function gateIsOpen() {
+    return document.documentElement.classList.contains("gate-locked");
+  }
+
+  function lockJourney() {
+    try {
+      localStorage.removeItem(GATE_KEY);
+    } catch {}
+    document.documentElement.classList.add("gate-locked");
+    if (els.gateCode) {
+      els.gateCode.value = "";
+      window.setTimeout(() => els.gateCode.focus(), 30);
+    }
+  }
+
+  function initGate() {
+    let unlocked = false;
+    try {
+      unlocked = Number(localStorage.getItem(GATE_KEY)) > Date.now();
+    } catch {}
+    if (unlocked) document.documentElement.classList.remove("gate-locked");
+    else window.setTimeout(() => els.gateCode?.focus(), 120);
+
+    els.gateForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const value = els.gateCode.value.trim();
+      if (!value) return;
+      try {
+        const hash = await sha256Hex(value);
+        if (hash !== GATE_HASH) throw new Error("wrong");
+        try {
+          localStorage.setItem(GATE_KEY, String(Date.now() + GATE_DAYS * 24 * 60 * 60 * 1000));
+        } catch {}
+        document.documentElement.classList.remove("gate-locked");
+        els.gateError.textContent = "";
+        els.gateCode.value = "";
+        toast("欢迎回来");
+      } catch {
+        els.gateError.textContent = "密码不正确，请再试一次。";
+        els.gateForm.classList.remove("is-error");
+        void els.gateForm.offsetWidth;
+        els.gateForm.classList.add("is-error");
+        els.gateCode.select();
+      }
+    });
+
+    els.lockBtn?.addEventListener("click", lockJourney);
   }
 
   function redirectToLogin() {
@@ -558,7 +626,9 @@
     const planCount = state.plan.items.length;
 
     const heroNumbers = $$("#heroStats dd strong");
+    if (heroNumbers[0]) heroNumbers[0].textContent = String(domesticCities.length);
     if (heroNumbers[1]) heroNumbers[1].textContent = String(allCount);
+    if (heroNumbers[2]) heroNumbers[2].textContent = String(intlCountries.length);
     els.domesticCount.textContent = String(domesticCount);
     els.domesticCityCount.textContent = String(domesticCities.length);
     els.intlCount.textContent = String(intlCountries.length);
@@ -1398,6 +1468,167 @@
     toastTimer = window.setTimeout(() => els.toast.classList.remove("is-show"), 2600);
   }
 
+  function searchCatalog() {
+    return {
+      cities: domesticCities.map((city) => ({
+        type: "domestic",
+        id: city.id,
+        title: city.name,
+        subtitle: `${city.region} · ${city.subtitle || "城市目的地"}`,
+        count: city.attractions.length,
+        haystack: [
+          city.name, city.en, city.region, city.subtitle, city.intro,
+          ...(city.foods || []), ...(city.play || []),
+          ...city.attractions.flatMap((attr) => [attr.name, attr.en, attr.cat, attr.highlight])
+        ].join(" ").toLowerCase()
+      })),
+      countries: intlCountries.map((country) => ({
+        type: "international",
+        id: country.id,
+        category: country.category,
+        title: country.name,
+        subtitle: `${country.continent} · ${country.cities.map((city) => city.name).join(" / ")}`,
+        count: country._attractions.length,
+        haystack: [
+          country.name, country.en, country.intro, country.stay,
+          ...(country.foods || []), ...(country.play || []),
+          country.visa?.type, country.visa?.where,
+          ...country.cities.flatMap((city) => [
+            city.name,
+            ...city.attractions.flatMap((attr) => [attr.name, attr.en, attr.cat, attr.highlight])
+          ])
+        ].join(" ").toLowerCase()
+      }))
+    };
+  }
+
+  const searchData = searchCatalog();
+  const popularSearchIds = [
+    "beijing", "shanghai", "chengdu", "dali", "xiamen", "hongkong",
+    "japan", "france", "thailand", "spain", "turkey", "korea"
+  ];
+
+  function searchCardMarkup(item) {
+    const kind = item.type === "domestic" ? "城市" : "国家";
+    const mark = item.type === "domestic" ? item.title.slice(0, 1) : (countryMap.get(item.id)?.flag || "·");
+    return `
+      <button class="search-city-card" type="button"
+        data-search-kind="${item.type}" data-search-id="${escapeAttr(item.id)}">
+        <span>
+          <strong>${escapeHtml(item.title)}</strong>
+          <small>${escapeHtml(kind)} · ${escapeHtml(item.subtitle)}</small>
+        </span>
+        <span class="search-count">${item.count} 个地点</span>
+      </button>
+    `;
+  }
+
+  function renderSearchRecommendations() {
+    if (!els.searchRecommend) return;
+    const all = [...searchData.cities, ...searchData.countries];
+    const recommendations = popularSearchIds
+      .map((id) => all.find((item) => item.id === id))
+      .filter(Boolean);
+    els.searchRecommend.innerHTML = `
+      <div class="search-section-head">
+        <h3>推荐目的地</h3>
+        <span>CURATED FOR YOU</span>
+      </div>
+      <div class="search-recommend-grid">
+        ${recommendations.map(searchCardMarkup).join("")}
+      </div>
+    `;
+    els.searchResults.hidden = true;
+    els.searchRecommend.hidden = false;
+  }
+
+  function renderSearchResults(query) {
+    const value = query.trim().toLowerCase();
+    if (!value) {
+      renderSearchRecommendations();
+      return;
+    }
+    const cities = searchData.cities.filter((item) => item.haystack.includes(value)).slice(0, 8);
+    const countries = searchData.countries.filter((item) => item.haystack.includes(value)).slice(0, 8);
+    els.searchRecommend.hidden = true;
+    els.searchResults.hidden = false;
+    if (!cities.length && !countries.length) {
+      els.searchResults.innerHTML = `<div class="search-empty">没有找到“${escapeHtml(query.trim())}”。试试城市、国家或景点名。</div>`;
+      return;
+    }
+    els.searchResults.innerHTML = `
+      ${cities.length ? `
+        <div class="search-result-group">
+          <h4>国内城市</h4>
+          ${cities.map((item) => `
+            <button class="search-result" type="button" data-search-kind="domestic" data-search-id="${escapeAttr(item.id)}">
+              <span class="search-result-mark">${escapeHtml(item.title.slice(0, 1))}</span>
+              <span class="search-result-main"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.subtitle)}</small></span>
+              <span class="search-result-arrow">→</span>
+            </button>
+          `).join("")}
+        </div>
+      ` : ""}
+      ${countries.length ? `
+        <div class="search-result-group">
+          <h4>国际目的地</h4>
+          ${countries.map((item) => `
+            <button class="search-result" type="button" data-search-kind="international" data-search-id="${escapeAttr(item.id)}">
+              <span class="search-result-mark">${escapeHtml(countryMap.get(item.id)?.flag || "·")}</span>
+              <span class="search-result-main"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.subtitle)}</small></span>
+              <span class="search-result-arrow">→</span>
+            </button>
+          `).join("")}
+        </div>
+      ` : ""}
+    `;
+  }
+
+  function openSearch() {
+    if (!els.searchDialog || gateIsOpen()) return;
+    if (!els.searchDialog.open) els.searchDialog.showModal();
+    els.globalSearch.value = "";
+    renderSearchRecommendations();
+    window.setTimeout(() => els.globalSearch.focus(), 50);
+    syncBodyLock();
+  }
+
+  function chooseSearchResult(kind, id) {
+    if (kind === "domestic") {
+      const city = domesticCityMap.get(id);
+      if (!city) return;
+      closeDialog(els.searchDialog);
+      setView("domestic");
+      state.region = "all";
+      els.domesticSearch.value = city.name;
+      state.domesticQuery = city.name;
+      renderRegionChips();
+      renderDomestic();
+      window.setTimeout(() => {
+        const block = document.querySelector(`[data-city-block="${CSS.escape(city.id)}"]`);
+        if (block) window.scrollTo({ top: block.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
+      }, 80);
+    } else {
+      const country = countryMap.get(id);
+      if (!country) return;
+      closeDialog(els.searchDialog);
+      setView("international");
+      state.intlCategory = country.category;
+      els.intlSearch.value = country.name;
+      state.intlQuery = country.name;
+      renderInternational();
+      window.setTimeout(() => {
+        const block = document.querySelector(`[data-country-block="${CSS.escape(country.id)}"]`);
+        if (block) window.scrollTo({ top: block.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" });
+      }, 80);
+    }
+  }
+
+  function closeDialog(dialog) {
+    if (dialog?.open) dialog.close();
+    syncBodyLock();
+  }
+
   function setView(view, { scroll = true, updateHash = true } = {}) {
     if (!["domestic", "international"].includes(view)) return;
     state.view = view;
@@ -1523,8 +1754,29 @@
     setupSearch(els.domesticSearch, "domesticQuery", renderDomestic);
     setupSearch(els.intlSearch, "intlQuery", renderInternational);
 
+    els.globalSearch?.addEventListener("input", () => {
+      renderSearchResults(els.globalSearch.value);
+    });
+    els.globalSearch?.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        const first = els.searchResults.querySelector("[data-search-kind]") ||
+          els.searchRecommend.querySelector("[data-search-kind]");
+        if (first) first.click();
+      }
+    });
+
     document.addEventListener("click", (event) => {
       const target = event.target;
+
+      if (target.closest("#searchOpenBtn, #heroSearchBtn")) {
+        openSearch();
+        return;
+      }
+      const searchHit = target.closest("[data-search-kind]");
+      if (searchHit) {
+        chooseSearchResult(searchHit.dataset.searchKind, searchHit.dataset.searchId);
+        return;
+      }
 
       const navLink = target.closest("[data-view]");
       if (navLink) {
@@ -1725,7 +1977,7 @@
         const tag = document.activeElement?.tagName;
         if (tag === "INPUT" || tag === "TEXTAREA" || document.activeElement?.isContentEditable) return;
         event.preventDefault();
-        (state.view === "domestic" ? els.domesticSearch : els.intlSearch)?.focus();
+        openSearch();
       }
     });
 
@@ -1937,6 +2189,7 @@
     renderInternational();
     renderPlan();
     bindEvents();
+    initGate();
 
     const initialView = window.location.hash === "#international" ? "international" : "domestic";
     setView(initialView, { scroll: false, updateHash: false });
